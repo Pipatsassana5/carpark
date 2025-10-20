@@ -148,14 +148,15 @@ void loop() {
       if (pressDuration < 5000) {
         // ----- กดแล้วปล่อยทันที -----
         systemBusy = true;
+        startupSequence();
         Serial.println("Main Sequence Start (short press)");
         runStepper(0, 14500, HIGH);
         delay(500);
         runStepper(1, 13000, LOW);
         delay(500);
         runDCMotorDown(0, 6000);
-        delay(2000);
-        startupSequence();
+        delay(1000);
+        
         Serial.println("Main Sequence Done");
         systemBusy = false;
       }
@@ -213,17 +214,19 @@ void loop() {
     // -------------------- ปุ่ม 47 --------------------
     else if (digitalRead(buttonDC2) == LOW) {
       systemBusy = true;
+      startupSequence();
       while (digitalRead(buttonDC2) == LOW);
       Serial.println("DC Motor 2 down 12s");
       runDCMotorDown(1, 7000);
-      delay(2000);
-      startupSequence();
+      
+      
       systemBusy = false;
     }
 
     // -------------------- ปุ่ม 49 --------------------
     else if (digitalRead(buttonSeq2) == LOW) {
       systemBusy = true;
+       startupSequence();
       while (digitalRead(buttonSeq2) == LOW);
       Serial.println("Stepper3 right 13s, Stepper4 right 12s, DC3 down 12s");
       runStepper(2, 15000, HIGH);
@@ -231,34 +234,36 @@ void loop() {
       runStepper(3, 13000, HIGH);
       delay(500);
       runDCMotorDown(2, 6000);
-      delay(2000);
-      startupSequence();
+      
+     
       systemBusy = false;
     }
 
     // -------------------- ปุ่ม 51 --------------------
     else if (digitalRead(buttonSeq3) == LOW) {
       systemBusy = true;
+       startupSequence();
       while (digitalRead(buttonSeq3) == LOW);
       Serial.println("Stepper2 left 12s, DC4 down 5s");
       runStepper(1, 13000, LOW);
       delay(500);
       runDCMotorDown(3, 4000);
-      delay(2000);
-      startupSequence();
+      
+     
       systemBusy = false;
     }
 
     // -------------------- ปุ่ม 53 --------------------
     else if (digitalRead(buttonSeq4) == LOW) {
       systemBusy = true;
+      startupSequence();
       while (digitalRead(buttonSeq4) == LOW);
       Serial.println("Stepper4 left 12s, DC5 down 5s");
       runStepper(3, 13000, HIGH);
       delay(500);
       runDCMotorDown(4, 4000);
-      delay(2000);
-      startupSequence();
+      
+      
       systemBusy = false;
     }
   }
