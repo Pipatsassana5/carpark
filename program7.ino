@@ -25,15 +25,22 @@ bool systemBusy = false;   // ป้องกันกดซ้อน
 
 // ==================== Function Startup ====================
 void startupSequence() {
-  for (int i = 0; i < numDCMotors; i++) {
+  for (int i = 0; i < numDCMotors; i++) { // up to limit then stop 
     digitalWrite(motorPinUp[i], HIGH);
     digitalWrite(motorPinDown[i], LOW);
     unsigned long startTime = millis();
-    while (millis() - startTime < runTimeDC && digitalRead(limitSwitchPinDC[i]) == HIGH);
+    while (millis() - startTime < runTimeDC && digitalRead(limitSwitchPinDC[i]) == HIGH); // count - count < 20 sec
     digitalWrite(motorPinUp[i], LOW);
     digitalWrite(motorPinDown[i], LOW);
-    delay(500);
-  }
+    delay(200);
+    digitalWrite(motorPinUp[i], LOW);
+    digitalWrite(motorPinDown[i], HIGH);
+   
+    delay(500); 
+
+    digitalWrite(motorPinUp[i], LOW);
+    digitalWrite(motorPinDown[i], LOW);
+  } // home up and down
 
   digitalWrite(stepDIR[0], LOW);
   digitalWrite(stepDIR[1], HIGH);
@@ -48,8 +55,29 @@ void startupSequence() {
       digitalWrite(stepPWM[i], LOW);  delayMicroseconds(1000);
     }
     digitalWrite(stepEN[i], HIGH);
+    delay(50); // หน่วงเวลาสั้นๆ ให้มอเตอร์หยุดสนิท
+
+    // --- ส่วนที่ 3: ถอยกลับตามจำนวนสเต็ป (ส่วนที่เพิ่มเข้ามาใหม่) ---
+
+    // 3.1 เปิดการทำงานอีกครั้ง เพื่อเตรียมเคลื่อนที่ถอยหลัง ⚡
+    digitalWrite(stepEN[i], LOW);
+
+    // 3.2 กลับทิศทางการหมุน 🔄
+    // เครื่องหมาย ! (NOT) จะทำการสลับสถานะจาก HIGH เป็น LOW หรือ LOW เป็น HIGH
+    digitalWrite(stepDIR[i], !digitalRead(stepDIR[i])); 
+    delay(10); // หน่วงเวลาสั้นมากๆ เพื่อให้ไดรเวอร์รับทิศทางใหม่
+
+    // 3.3 สั่งให้เคลื่อนที่ถอยหลังตามจำนวนสเต็ปที่กำหนด 🔢
+    for (int j = 0; j < 50; j++) {
+      digitalWrite(stepPWM[i], HIGH); delayMicroseconds(1000);
+      digitalWrite(stepPWM[i], LOW);  delayMicroseconds(1000);
+    }
+
+    // 3.4 ปิดการทำงานเป็นครั้งสุดท้าย เพื่อล็อคแกนในตำแหน่งที่ถูกต้อง 💤
+    
+    digitalWrite(stepEN[i], HIGH);
     delay(500);
-  }
+  } // home left and right
   Serial.println("Startup sequence done.");
 }
 
